@@ -1,0 +1,1 @@
+[lsp]2024/04/29 19:45:17 main.go:12: Hey, I'm running!
