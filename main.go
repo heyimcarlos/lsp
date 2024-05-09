@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	// "fmt"
 	"log"
 	"lsp/rpc"
 	"os"
@@ -10,21 +11,27 @@ import (
 func main() {
 	logger := getLogger("/Users/carlos/Documents/code/personal/lsp/log.txt")
 	logger.Println("Hey, I'm running!")
-	//  NOTE: Keep reading from stdin, until there's a message.
+	//  Keep reading from stdin, until there's a message.
 
 	//  NOTE: Scanner reads from it's param, until there's a new message; In this case reading from Stdin.
 	scanner := bufio.NewScanner(os.Stdin)
-	//  NOTE: scanner.Split takes a SplitFunc which overwrites the default Split function called when a new message is received
+	//  NOTE: scanner.Split takes a SplitFunc which overwrites the default Split function
+	// called when a new message is received
 	scanner.Split(rpc.Split)
 
 	for scanner.Scan() {
-		msg := scanner.Text()
-		handleMessage(logger, msg)
+		msg := scanner.Bytes()
+		method, contents, err := rpc.DecodeMessage(msg)
+		if err != nil {
+			logger.Printf("Got an error: %s", err)
+			continue
+		}
+		handleMessage(logger, method, contents)
 	}
 }
 
-func handleMessage(logger *log.Logger, msg any) {
-	logger.Println(msg)
+func handleMessage(logger *log.Logger, method string, contents []byte) {
+	logger.Printf("Received msg with method: %s", method)
 }
 
 func getLogger(filename string) *log.Logger {
