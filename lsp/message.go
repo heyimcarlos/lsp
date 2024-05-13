@@ -1,7 +1,7 @@
 package lsp
 
 type Request struct {
-	RPC    string `"json:jsonrpc"`
+	RPC    string `json:"jsonrpc"`
 	ID     int    `json:"id"`
 	Method string `json:"method"`
 
@@ -17,6 +17,6 @@ type Response struct {
 }
 
 type Notification struct {
-	RPC    string `json:"jsonrpc`
+	RPC    string `json:"jsonrpc"`
 	Method string `json:"method"`
 }

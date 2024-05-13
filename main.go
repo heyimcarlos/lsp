@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	// "fmt"
 	"log"
+	"lsp/lsp"
 	"lsp/rpc"
 	"os"
 )
@@ -32,6 +34,32 @@ func main() {
 
 func handleMessage(logger *log.Logger, method string, contents []byte) {
 	logger.Printf("Received msg with method: %s", method)
+
+	switch method {
+	case "initialize":
+		var request lsp.InitializeRequest
+		if err := json.Unmarshal(contents, &request); err != nil {
+			logger.Printf("Hey, this couldn't be parsed: %s", err)
+		}
+
+		logger.Printf("Connected to: %s %s", request.Params.ClientInfo.Name, request.Params.ClientInfo.Version)
+
+		// reply!
+		msg := lsp.NewInitializeResponse(request.ID)
+		reply := rpc.EncodeMessage(msg)
+
+		writer := os.Stdout
+		writer.Write([]byte(reply))
+
+		logger.Print("Sent the reply")
+
+	case "textDocument/didOpen":
+		var request lsp.DidOpenTextDocumentNotification
+		if err := json.Unmarshal(contents, &request); err != nil {
+			logger.Printf("Hey, this couldn't be parsed: %s", err)
+		}
+		logger.Printf("Connected to: %s %s %s", request.Params.TextDocument.URI, request.Params.TextDocument.Text, request.Params.TextDocument.LanguageID)
+	}
 }
 
 func getLogger(filename string) *log.Logger {
